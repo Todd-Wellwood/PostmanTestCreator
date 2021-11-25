@@ -1,0 +1,54 @@
+//Get globalData and a random index to check
+var jsonData = pm.response.json();
+var randomIndex = Math.floor(Math.random() * jsonData.length)
+
+//Test to check id is positive
+pm.test("Check id is positive", function () {
+    pm.expect(jsonData[randomIndex].id).to.greaterThan(0);
+});
+
+//Test to check createDate is valid date
+pm.test("Check createDate is valid date", function () {
+    pm.expect(Date.parse(jsonData[randomIndex].createDate)).not.equal(NaN)
+});
+
+//Test to check removed is a boolean
+pm.test("Check removed is a boolean", function () {
+    pm.expect(typeof jsonData[randomIndex].removed).to.equal('boolean')
+});
+
+//Test to check version is non-negative
+pm.test("Check version is non-negative", function () {
+    pm.expect(jsonData[randomIndex].version).to.greaterThan(-1);
+});
+
+//Test to check name is a string
+pm.test("Check name is a string", function () {
+    pm.expect(typeof jsonData[randomIndex].name).to.equal('string')
+});
+
+//Test to check animalTypeId is non-negative
+pm.test("Check animalTypeId is non-negative", function () {
+    pm.expect(jsonData[randomIndex].animalTypeId).to.greaterThan(-1);
+});
+
+//Test to check unknown is a boolean
+pm.test("Check unknown is a boolean", function () {
+    pm.expect(typeof jsonData[randomIndex].unknown).to.equal('boolean')
+});
+
+//Test to check subSpecies is non-negative
+pm.test("Check subSpecies is non-negative", function () {
+    pm.expect(jsonData[randomIndex].subSpecies).to.greaterThan(-1);
+});
+
+//Test to check breedCategory is non-negative
+pm.test("Check breedCategory is non-negative", function () {
+    pm.expect(jsonData[randomIndex].breedCategory).to.greaterThan(-1);
+});
+
+//Test to check naitcode is a string
+pm.test("Check naitcode is a string", function () {
+    pm.expect(typeof jsonData[randomIndex].naitcode).to.equal('string')
+});
+

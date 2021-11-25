@@ -1,0 +1,18 @@
+//Test to loop through all the required fields are not null
+pm.test("Check all fields are present", function () {
+   var jsonData = pm.response.json();
+   var randomIndex = Math.floor(Math.random() * jsonData.length)
+
+   var requiredElements =[
+        id, 
+        createDate, 
+        removed, 
+        version, 
+        name, 
+        animalTypeId, 
+        unknown];
+
+ //Loop through all the required fields checking they are not null
+ requiredElements.forEach(element =>
+ pm.expect(jsonData[randomIndex][element]).to.not.equal(null));
+});

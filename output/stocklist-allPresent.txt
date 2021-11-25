@@ -1,0 +1,24 @@
+//Test to loop through all the fields are present
+pm.test("Check all fields are present", function () {
+   var jsonData = pm.response.json();
+   var randomIndex = Math.floor(Math.random() * jsonData.length)
+
+   var requiredElements =[
+        animalGroupId, 
+        mobId, 
+        breedId, 
+        animalTypeId, 
+        animalGenderId, 
+        revenueGroupId, 
+        ownerId, 
+        locationId, 
+        yearBorn, 
+        totalTally, 
+        paddocks, 
+        paddockId, 
+        tally];
+
+   //Loop through all the required fields
+   requiredElements.forEach(element => pm.expect
+   (jsonData[randomIndex]).to.have.property(element));
+});
