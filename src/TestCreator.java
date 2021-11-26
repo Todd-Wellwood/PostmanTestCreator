@@ -108,7 +108,7 @@ public class TestCreator {
                 "For the field \"" + token.name + "\" please select which regex option would you like:\n"
                         + "(1). Positive Number\n"
                         + "(2). Non-Negative Number\n"
-                        + "(3). Date\n"
+                        + "(3). Date\n" //TODO DATE SHOULD BE HANDLED IN THE STRING HELPER
                         + "(4). Day\n"
                         + "(5). Month\n"
                         + "(6). Year\n";
