@@ -30,7 +30,8 @@ public class TestCreator {
 
         ArrayList<String> allNames = new ArrayList<>();
         for (SchemaToken el : allTokens) {
-            allNames.add("\n        " + el.name);
+            //Weird formatting so that we have the quotes around
+            allNames.add("\n        " + "\"" + el.name + "\"");
         }
 
         writer.write("" +
@@ -58,7 +59,8 @@ public class TestCreator {
 
         ArrayList<String> allNonNullFields = new ArrayList<>();
         for (SchemaToken el : allTokens.stream().filter(i -> i.isRequired).collect(Collectors.toList())) {
-            allNonNullFields.add("\n        " + el.name);
+            //Weird formatting so that we have the quotes around
+            allNonNullFields.add("\n        " + "\"" + el.name + "\"");
         }
 
         writer.write("" +
@@ -136,86 +138,108 @@ public class TestCreator {
     private static void regexNumberPositive(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is positive\n" +
-                "pm.test(\"Check " + token.name + " is positive\", function () {\n" +
+                "pm.test(\"Check " + token.name + " is positive\", function () {\n");
+        if (!token.isRequired)
+            writer.write("if(jsonData[randomIndex]." + token.name + " != null)");
+        writer.write(
                 "    pm.expect(jsonData[randomIndex]." + token.name + ").to.greaterThan(0);\n" +
-                "});\n\n");
+                        "});\n\n");
     }
 
     private static void regexNumberNonNegative(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is non-negative\n" +
-                "pm.test(\"Check " + token.name + " is non-negative\", function () {\n" +
+                "pm.test(\"Check " + token.name + " is non-negative\", function () {\n");
+        if (!token.isRequired)
+            writer.write("if(jsonData[randomIndex]." + token.name + " != null)");
+        writer.write(
                 "    pm.expect(jsonData[randomIndex]." + token.name + ").to.greaterThan(-1);\n" +
-                "});\n\n");
+                        "});\n\n");
     }
 
     private static void regexNumberDayOfMonth(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid day of month; between (inclusive) 1 and 31\n" +
-                "pm.test(\"Check " + token.name + " is valid day of month; between (inclusive) 1 and 31\", function () {\n" +
+                "pm.test(\"Check " + token.name + " is valid day of month; between (inclusive) 1 and 31\", function () {\n");
+        if (!token.isRequired)
+            writer.write("if(jsonData[randomIndex]." + token.name + " != null)");
+        writer.write(
                 "    var result = jsonData[randomIndex]." + token.name + " > 0 && jsonData[randomIndex]." + token.name + " < 32;\n" +
-                "    pm.expect(result).to.equal(true)\n" +
-                "});\n\n");
+                        "    pm.expect(result).to.equal(true)\n" +
+                        "});\n\n");
     }
 
     private static void regexNumberMonth(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid month; between (inclusive) 1 and 12\n" +
-                "pm.test(\"Check " + token.name + " is valid month; between (inclusive) 1 and 12\", function () {\n" +
+                "pm.test(\"Check " + token.name + " is valid month; between (inclusive) 1 and 12\", function () {\n");
+        if (!token.isRequired)
+            writer.write("if(jsonData[randomIndex]." + token.name + " != null)");
+        writer.write(
                 "    var result = jsonData[randomIndex]." + token.name + " > 0 && jsonData[randomIndex]." + token.name + " < 13;\n" +
-                "    pm.expect(result).to.equal(true)\n" +
-                "});\n\n");
+                        "    pm.expect(result).to.equal(true)\n" +
+                        "});\n\n");
     }
 
     private static void regexNumberYear(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid year\n" +
-                "pm.test(\"Check " + token.name + " is valid year\", function () {\n" +
+                "pm.test(\"Check " + token.name + " is valid year\", function () {\n");
+        if (!token.isRequired)
+            writer.write("if(jsonData[randomIndex]." + token.name + " != null)");
+        writer.write(
                 "    pm.expect(jsonData[randomIndex]." + token.name + ").to.match(/^\\d{4}$/);\n" +
-                "});\n\n");
+                        "});\n\n");
     }
 
     private static void regexNumberDate(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid date\n" +
-                "pm.test(\"Check " + token.name + " is valid date\", function () {\n" +
+                "pm.test(\"Check " + token.name + " is valid date\", function () {\n");
+        if (!token.isRequired)
+            writer.write("if(jsonData[randomIndex]." + token.name + " != null)");
+        writer.write(
                 "    pm.expect(Date.parse(jsonData[randomIndex]." + token.name + ")).not.equal(NaN)\n" +
-                "});\n\n");
+                        "});\n\n");
     }
 
     private static void regexBoolean(SchemaToken token) throws IOException {
-        //TODO ADD SKIPS FOR NON REQUIRED FIELDS TO BE NULL EG  ADD ON FOR ALL NON REQUIRED FIELDS if(jsonData[randomIndex].organisationId != null)
         writer.write("" +
                 "//Test to check " + token.name + " is a boolean\n" +
-                "pm.test(\"Check " + token.name + " is a boolean\", function () {\n" +
+                "pm.test(\"Check " + token.name + " is a boolean\", function () {\n");
+        if (!token.isRequired)
+            writer.write("if(jsonData[randomIndex]." + token.name + " != null)");
+        writer.write(
                 "    pm.expect(typeof jsonData[randomIndex]." + token.name + ").to.equal('boolean')\n" +
-                "});\n\n");
+                        "});\n\n");
 
     }
 
     /**
-     *
      * @param token The Array Token to process
      * @throws IOException if the file isn't found
      */
     private static void regexArrayHelper(SchemaToken token) throws IOException {
-       //TODO
+        //TODO
     }
 
     /**
-     *
      * @param token The Array Token to process
      * @throws IOException if the file isn't found
      */
     private static void regexStringHelper(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is a string\n" +
-                "pm.test(\"Check " + token.name + " is a string\", function () {\n" +
+                "pm.test(\"Check " + token.name + " is a string\", function () {\n");
+        if (!token.isRequired)
+            writer.write("if(jsonData[randomIndex]." + token.name + " != null)");
+        writer.write(
                 "    pm.expect(typeof jsonData[randomIndex]." + token.name + ").to.equal('string')\n" +
-                "});\n\n");
+                        "});\n\n");
     }
 
-    /** Used to get the name for the file outputs, also initializes the scanner to point at the input file
+    /**
+     * Used to get the name for the file outputs, also initializes the scanner to point at the input file
      *
      * @throws IOException if the file isn't found
      */
@@ -227,7 +251,6 @@ public class TestCreator {
         apiName = scan.next();
 
         //Reset to first parameter
-        scan.nextLine();
         scan.nextLine();
         scan.nextLine();
     }
