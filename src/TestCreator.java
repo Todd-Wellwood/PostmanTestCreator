@@ -212,7 +212,8 @@ public class TestCreator {
 
     }
 
-    /** Used for adding the prefix
+    /**
+     * Used for adding the prefix
      *
      * @throws IOException if the file isn't found
      */
@@ -240,7 +241,7 @@ public class TestCreator {
                 "    pm.expect(typeof jsonData" + indexSpecificationString + "." + token.name + ").to.equal('string')\n" +
                         "});\n\n");
 
-        if(token.name.toLowerCase(Locale.ROOT).contains("date"))
+        if (token.name.toLowerCase(Locale.ROOT).contains("date"))
             regexStringDate(token);
     }
 
@@ -266,7 +267,7 @@ public class TestCreator {
         }
 
         //Void the required tag (Will always be required no matter what)
-        if(scan.hasNext("required")) scan.next();
+        if (scan.hasNext("required")) scan.next();
 
     }
 
