@@ -3,6 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ public class TestCreator {
 
     //Tokens List
     private static final ArrayList<SchemaToken> allTokens = new ArrayList<>();
+    private static boolean doInsertArrayHeader;
 
     public static void main(String[] args) throws IOException {
         setupInputAndOutput();
@@ -85,14 +87,11 @@ public class TestCreator {
 
     private static void regexTestCreation() throws IOException {
         writer = new FileWriter("output/" + apiName + "-regex.txt");
-        writer.write("//Get globalData and a random index to check\n" +
-                "var jsonData = pm.response.json();\n" +
-                "var randomIndex = Math.floor(Math.random() * jsonData.length)\n\n");
+        if(doInsertArrayHeader) arrayHelper();
 
         for (SchemaToken token : allTokens) {
             switch (token.tokenType) {
                 case ("number"), ("integer") -> regexNumberHelper(token);
-                case ("array") -> regexArrayHelper(token);
                 case ("boolean") -> regexBoolean(token);
                 case ("string") -> regexStringHelper(token);
             }
@@ -102,7 +101,6 @@ public class TestCreator {
     }
 
     private static void regexNumberHelper(SchemaToken token) throws IOException {
-        //TODO intergrate with ability to be null
         consoleClear();
         //TODO automate this part, ADD to input file instead/option to have auto selector?
         //Eg user chooses if manual or not
@@ -110,16 +108,15 @@ public class TestCreator {
                 "For the field \"" + token.name + "\" please select which regex option would you like:\n"
                         + "(1). Positive Number\n"
                         + "(2). Non-Negative Number\n"
-                        + "(3). Date\n" //TODO DATE SHOULD BE HANDLED IN THE STRING HELPER
-                        + "(4). Day\n"
-                        + "(5). Month\n"
-                        + "(6). Year\n";
+                        + "(3). Day\n"
+                        + "(4). Month\n"
+                        + "(5). Year\n";
 
         System.out.println(message);
         scan = new Scanner(System.in);
         String response = scan.next();
 
-        while (!response.matches("1|2|3|4|5|6")) {
+        while (!response.matches("1|2|3|4|5|")) {
             consoleClear();
             System.out.println("Invalid Response\n" + message);
             response = scan.next();
@@ -128,10 +125,9 @@ public class TestCreator {
         switch (parseInt(response)) {
             case (1) -> regexNumberPositive(token);
             case (2) -> regexNumberNonNegative(token);
-            case (3) -> regexNumberDate(token);
-            case (4) -> regexNumberDayOfMonth(token);
-            case (5) -> regexNumberMonth(token);
-            case (6) -> regexNumberYear(token);
+            case (3) -> regexNumberDayOfMonth(token);
+            case (4) -> regexNumberMonth(token);
+            case (5) -> regexNumberYear(token);
         }
     }
 
@@ -192,7 +188,7 @@ public class TestCreator {
                         "});\n\n");
     }
 
-    private static void regexNumberDate(SchemaToken token) throws IOException {
+    private static void regexStringDate(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid date\n" +
                 "pm.test(\"Check " + token.name + " is valid date\", function () {\n");
@@ -215,12 +211,14 @@ public class TestCreator {
 
     }
 
-    /**
-     * @param token The Array Token to process
+    /** Used for adding the prefix
+     *
      * @throws IOException if the file isn't found
      */
-    private static void regexArrayHelper(SchemaToken token) throws IOException {
-        //TODO
+    private static void arrayHelper() throws IOException {
+        writer.write("//Get globalData and a random index to check\n" +
+                "var jsonData = pm.response.json();\n" +
+                "var randomIndex = Math.floor(Math.random() * jsonData.length)\n\n");
     }
 
     /**
@@ -236,6 +234,9 @@ public class TestCreator {
         writer.write(
                 "    pm.expect(typeof jsonData[randomIndex]." + token.name + ").to.equal('string')\n" +
                         "});\n\n");
+
+        if(token.name.toLowerCase(Locale.ROOT).contains("date"))
+            regexStringDate(token);
     }
 
     /**
@@ -250,8 +251,14 @@ public class TestCreator {
         //Store the API name
         apiName = scan.next();
 
-        scan.next();
+        //If it's an array call the array helper to insert the required header
+        if(scan.next().toLowerCase(Locale.ROOT).contains("array")){
+            doInsertArrayHeader = true;
+        }
+
+        //Void the required tag (Will always be required no matter what)
         if(scan.hasNext("required")) scan.next();
+
     }
 
     /**
