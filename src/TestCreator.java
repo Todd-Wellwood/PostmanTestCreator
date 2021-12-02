@@ -28,16 +28,18 @@ public class TestCreator {
     }
 
     private static void allPresentTestCreation() throws IOException {
+        //Initialise the file and setup for if it's an Array
         writer = new FileWriter("output/" + apiName + "-allPresent.txt");
-        if (indexSpecificationString.length() != 0) arrayHelper();
+        if (indexSpecificationString.length() != 0) arraySetup();
         else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
+        //Get the names of all the fields
         ArrayList<String> allNames = new ArrayList<>();
         for (SchemaToken el : allTokens) {
-            //Weird formatting so that we have the quotes around
             allNames.add("\n        " + "\"" + el.name + "\"");
         }
 
+        //Write a test to check all fields are present
         writer.write("" +
                 "//Test to loop through all the fields are present\n" +
                 "pm.test(\"Check all fields are present\", function () {\n" +
@@ -57,13 +59,14 @@ public class TestCreator {
     }
 
     private static void requiredNotNullTestCreation() throws IOException {
+        //Initialise the file and setup for if it's an Array
         writer = new FileWriter("output/" + apiName + "-requiredNotNull.txt");
-        if (indexSpecificationString.length() != 0) arrayHelper();
+        if (indexSpecificationString.length() != 0) arraySetup();
         else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
+        //Get the names of all the required (can't be null) fields
         ArrayList<String> allNonNullFields = new ArrayList<>();
         for (SchemaToken el : allTokens.stream().filter(i -> i.isRequired).collect(Collectors.toList())) {
-            //Weird formatting so that we have the quotes around
             allNonNullFields.add("\n        " + "\"" + el.name + "\"");
         }
 
@@ -85,14 +88,19 @@ public class TestCreator {
         writer.close();
     }
 
+    /**
+     * @throws IOException
+     */
     private static void regexTestCreation() throws IOException {
+        //Initialise the file and setup for if it's an Array
         writer = new FileWriter("output/" + apiName + "-regex.txt");
-        if (indexSpecificationString.length() != 0) arrayHelper();
+        if (indexSpecificationString.length() != 0) arraySetup();
         else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
+        //Assign tokens to specific regexHelpers
         for (SchemaToken token : allTokens) {
             switch (token.tokenType) {
-                case ("number"), ("integer") -> regexNumberHelper(token);
+                case ("number"), ("integer") -> regexNumberSorter(token);
                 case ("boolean") -> regexBoolean(token);
                 case ("string") -> regexStringHelper(token);
             }
@@ -101,10 +109,16 @@ public class TestCreator {
         writer.close();
     }
 
-    private static void regexNumberHelper(SchemaToken token) throws IOException {
+    /** Asks the user for specific validation options for a specific token,
+     *  This is used to assign each token to a specific regex helper method
+     *  These helper methods will then generate the correct regex test for that specific token
+     *  TODO: automate the asking part so it doesn't need to occur
+     *
+     * @param token the number token to sort to the correct helper method
+     * @throws IOException if the file isn't found
+     */
+    private static void regexNumberSorter(SchemaToken token) throws IOException {
         consoleClear();
-        //TODO automate this part, ADD to input file instead/option to have auto selector?
-        //Eg user chooses if manual or not
         String message =
                 "For the field \"" + token.name + "\" please select which regex option would you like:\n"
                         + "(1). Positive Number\n"
@@ -132,6 +146,11 @@ public class TestCreator {
         }
     }
 
+    /** Generates test for tokens that need to be validated as positive eg, X > 0
+     *
+     * @param token the token to generate the test for
+     * @throws IOException if the file isn't found
+     */
     private static void regexNumberPositive(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is positive\n" +
@@ -143,6 +162,11 @@ public class TestCreator {
                         "});\n\n");
     }
 
+    /** Generates test for tokens that need to be validated as non-negative eg, X >= 0
+     *
+     * @param token the token to generate the test for
+     * @throws IOException if the file isn't found
+     */
     private static void regexNumberNonNegative(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is non-negative\n" +
@@ -154,6 +178,11 @@ public class TestCreator {
                         "});\n\n");
     }
 
+    /** Generates test for tokens that need to be validated as a day (Number)
+     *
+     * @param token the token to generate the test for
+     * @throws IOException if the file isn't found
+     */
     private static void regexNumberDayOfMonth(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid day of month; between (inclusive) 1 and 31\n" +
@@ -166,6 +195,11 @@ public class TestCreator {
                         "});\n\n");
     }
 
+    /** Generates test for tokens that need to be validated as a month (Number)
+     *
+     * @param token the token to generate the test for
+     * @throws IOException if the file isn't found
+     */
     private static void regexNumberMonth(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid month; between (inclusive) 1 and 12\n" +
@@ -178,6 +212,11 @@ public class TestCreator {
                         "});\n\n");
     }
 
+    /** Generates test for tokens that need to be validated as a year
+     *
+     * @param token the token to generate the test for
+     * @throws IOException if the file isn't found
+     */
     private static void regexNumberYear(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid year\n" +
@@ -189,6 +228,11 @@ public class TestCreator {
                         "});\n\n");
     }
 
+    /** Generates test for String tokens
+     *
+     * @param token the token to generate the test for
+     * @throws IOException if the file isn't found
+     */
     private static void regexStringDate(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is valid date\n" +
@@ -200,6 +244,11 @@ public class TestCreator {
                         "});\n\n");
     }
 
+    /** Generates test for boolean tokens
+     *
+     * @param token the token to generate the test for
+     * @throws IOException if the file isn't found
+     */
     private static void regexBoolean(SchemaToken token) throws IOException {
         writer.write("" +
                 "//Test to check " + token.name + " is a boolean\n" +
@@ -212,22 +261,8 @@ public class TestCreator {
 
     }
 
-    /**
-     * Used for adding the prefix
+    /** Generates test for string tokens
      *
-     * @throws IOException if the file isn't found
-     */
-    private static void arrayHelper() throws IOException {
-        writer.write("""
-                //Get globalData and a random index to check
-                var jsonData = pm.response.json();
-                var randomIndex = Math.floor(Math.random() * jsonData.length)
-
-                """);
-
-    }
-
-    /**
      * @param token The Array Token to process
      * @throws IOException if the file isn't found
      */
@@ -245,6 +280,21 @@ public class TestCreator {
             regexStringDate(token);
     }
 
+
+    /**
+     * Used for adding the prefix
+     *
+     * @throws IOException if the file isn't found
+     */
+    private static void arraySetup() throws IOException {
+        writer.write("""
+                //Get globalData and a random index to check
+                var jsonData = pm.response.json();
+                var randomIndex = Math.floor(Math.random() * jsonData.length)
+
+                """);
+    }
+
     /**
      * Used to get the name for the file outputs, also initializes the scanner to point at the input file
      *
@@ -257,13 +307,14 @@ public class TestCreator {
         //Store the API name
         apiName = scan.next();
 
-        String storage = scan.next();
+        //Nasty way of checking if writing for array API, stops case-sensitive problems
+        String possibleArrayParameter = scan.next();
 
         //If it's an array call the array helper to insert the required header
-        if (storage.toLowerCase(Locale.ROOT).contains("array")) {
+        if (possibleArrayParameter.toLowerCase(Locale.ROOT).contains("array")) {
             indexSpecificationString = "[randomIndex]";
         } else {
-            allTokens.add(new SchemaToken(apiName, storage, scan.hasNext("required")));
+            allTokens.add(new SchemaToken(apiName, possibleArrayParameter, scan.hasNext("required")));
         }
 
         //Void the required tag (Will always be required no matter what)
