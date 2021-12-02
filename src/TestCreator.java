@@ -17,7 +17,6 @@ public class TestCreator {
 
     //Tokens List
     private static final ArrayList<SchemaToken> allTokens = new ArrayList<>();
-    private static boolean doInsertArrayHeader;
     private static String indexSpecificationString = "";
 
     public static void main(String[] args) throws IOException {
@@ -30,6 +29,8 @@ public class TestCreator {
 
     private static void allPresentTestCreation() throws IOException {
         writer = new FileWriter("output/" + apiName + "-allPresent.txt");
+        if (indexSpecificationString.length() != 0) arrayHelper();
+        else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
         ArrayList<String> allNames = new ArrayList<>();
         for (SchemaToken el : allTokens) {
@@ -40,8 +41,6 @@ public class TestCreator {
         writer.write("" +
                 "//Test to loop through all the fields are present\n" +
                 "pm.test(\"Check all fields are present\", function () {\n" +
-                "   var jsonData = pm.response.json();\n" +
-                "   var randomIndex = Math.floor(Math.random() * jsonData.length)\n" +
                 "\n   var requiredElements ="
                 +
                 allNames
@@ -59,6 +58,8 @@ public class TestCreator {
 
     private static void requiredNotNullTestCreation() throws IOException {
         writer = new FileWriter("output/" + apiName + "-requiredNotNull.txt");
+        if (indexSpecificationString.length() != 0) arrayHelper();
+        else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
         ArrayList<String> allNonNullFields = new ArrayList<>();
         for (SchemaToken el : allTokens.stream().filter(i -> i.isRequired).collect(Collectors.toList())) {
@@ -69,8 +70,6 @@ public class TestCreator {
         writer.write("" +
                 "//Test to loop through all the required fields are not null\n" +
                 "pm.test(\"Check all fields are present\", function () {\n" +
-                "   var jsonData = pm.response.json();\n" +
-                "   var randomIndex = Math.floor(Math.random() * jsonData.length)\n" +
                 "\n   var requiredElements ="
                 +
                 allNonNullFields
@@ -88,7 +87,8 @@ public class TestCreator {
 
     private static void regexTestCreation() throws IOException {
         writer = new FileWriter("output/" + apiName + "-regex.txt");
-        if(doInsertArrayHeader) arrayHelper();
+        if (indexSpecificationString.length() != 0) arrayHelper();
+        else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
         for (SchemaToken token : allTokens) {
             switch (token.tokenType) {
@@ -253,10 +253,13 @@ public class TestCreator {
         //Store the API name
         apiName = scan.next();
 
+        String storage = scan.next();
+
         //If it's an array call the array helper to insert the required header
-        if(scan.next().toLowerCase(Locale.ROOT).contains("array")){
-            doInsertArrayHeader = true;
+        if (storage.toLowerCase(Locale.ROOT).contains("array")) {
             indexSpecificationString = "[randomIndex]";
+        } else {
+            allTokens.add(new SchemaToken(apiName, storage, scan.hasNext("required")));
         }
 
         //Void the required tag (Will always be required no matter what)
