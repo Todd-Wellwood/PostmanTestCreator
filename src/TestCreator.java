@@ -17,7 +17,7 @@ public class TestCreator {
 
     //Tokens List
     private static final ArrayList<SchemaToken> allTokens = new ArrayList<>();
-    private static boolean doInsertArrayHeader;
+    private static String indexSpecificationString = "";
 
     public static void main(String[] args) throws IOException {
         setupInputAndOutput();
@@ -29,6 +29,8 @@ public class TestCreator {
 
     private static void allPresentTestCreation() throws IOException {
         writer = new FileWriter("output/" + apiName + "-allPresent.txt");
+        if (indexSpecificationString.length() != 0) arrayHelper();
+        else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
         ArrayList<String> allNames = new ArrayList<>();
         for (SchemaToken el : allTokens) {
@@ -39,8 +41,6 @@ public class TestCreator {
         writer.write("" +
                 "//Test to loop through all the fields are present\n" +
                 "pm.test(\"Check all fields are present\", function () {\n" +
-                "   var jsonData = pm.response.json();\n" +
-                "   var randomIndex = Math.floor(Math.random() * jsonData.length)\n" +
                 "\n   var requiredElements ="
                 +
                 allNames
@@ -49,7 +49,7 @@ public class TestCreator {
                 "\n" +
                 "   //Loop through all the required fields\n" +
                 "   requiredElements.forEach(element => pm.expect\n" +
-                "   (jsonData[randomIndex]).to.have.property(element));\n" +
+                "   (jsonData" + indexSpecificationString + ").to.have.property(element));\n" +
                 "});"
         );
 
@@ -58,6 +58,8 @@ public class TestCreator {
 
     private static void requiredNotNullTestCreation() throws IOException {
         writer = new FileWriter("output/" + apiName + "-requiredNotNull.txt");
+        if (indexSpecificationString.length() != 0) arrayHelper();
+        else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
         ArrayList<String> allNonNullFields = new ArrayList<>();
         for (SchemaToken el : allTokens.stream().filter(i -> i.isRequired).collect(Collectors.toList())) {
@@ -68,8 +70,6 @@ public class TestCreator {
         writer.write("" +
                 "//Test to loop through all the required fields are not null\n" +
                 "pm.test(\"Check all fields are present\", function () {\n" +
-                "   var jsonData = pm.response.json();\n" +
-                "   var randomIndex = Math.floor(Math.random() * jsonData.length)\n" +
                 "\n   var requiredElements ="
                 +
                 allNonNullFields
@@ -78,7 +78,7 @@ public class TestCreator {
                 "\n" +
                 " //Loop through all the required fields checking they are not null\n" +
                 " requiredElements.forEach(element =>\n" +
-                " pm.expect(jsonData[randomIndex][element]).to.not.equal(null));\n" +
+                " pm.expect(jsonData" + indexSpecificationString + "[element]).to.not.equal(null));\n" +
                 "});"
         );
 
@@ -87,7 +87,8 @@ public class TestCreator {
 
     private static void regexTestCreation() throws IOException {
         writer = new FileWriter("output/" + apiName + "-regex.txt");
-        if(doInsertArrayHeader) arrayHelper();
+        if (indexSpecificationString.length() != 0) arrayHelper();
+        else writer.write("//Get globalData\nvar jsonData = pm.response.json();\n\n");
 
         for (SchemaToken token : allTokens) {
             switch (token.tokenType) {
@@ -136,9 +137,9 @@ public class TestCreator {
                 "//Test to check " + token.name + " is positive\n" +
                 "pm.test(\"Check " + token.name + " is positive\", function () {\n");
         if (!token.isRequired)
-            writer.write("if(jsonData[randomIndex]." + token.name + " != null) \n");
+            writer.write("if(jsonData" + indexSpecificationString + "." + token.name + " != null) \n");
         writer.write(
-                "    pm.expect(jsonData[randomIndex]." + token.name + ").to.greaterThan(0);\n" +
+                "    pm.expect(jsonData" + indexSpecificationString + "." + token.name + ").to.greaterThan(0);\n" +
                         "});\n\n");
     }
 
@@ -147,9 +148,9 @@ public class TestCreator {
                 "//Test to check " + token.name + " is non-negative\n" +
                 "pm.test(\"Check " + token.name + " is non-negative\", function () {\n");
         if (!token.isRequired)
-            writer.write("if(jsonData[randomIndex]." + token.name + " != null) \n");
+            writer.write("if(jsonData" + indexSpecificationString + "." + token.name + " != null) \n");
         writer.write(
-                "    pm.expect(jsonData[randomIndex]." + token.name + ").to.greaterThan(-1);\n" +
+                "    pm.expect(jsonData" + indexSpecificationString + "." + token.name + ").to.greaterThan(-1);\n" +
                         "});\n\n");
     }
 
@@ -158,9 +159,9 @@ public class TestCreator {
                 "//Test to check " + token.name + " is valid day of month; between (inclusive) 1 and 31\n" +
                 "pm.test(\"Check " + token.name + " is valid day of month; between (inclusive) 1 and 31\", function () {\n");
         if (!token.isRequired)
-            writer.write("if(jsonData[randomIndex]." + token.name + " != null) \n");
+            writer.write("if(jsonData" + indexSpecificationString + "." + token.name + " != null) \n");
         writer.write(
-                "    var result = jsonData[randomIndex]." + token.name + " > 0 && jsonData[randomIndex]." + token.name + " < 32;\n" +
+                "    var result = jsonData" + indexSpecificationString + "." + token.name + " > 0 && jsonData" + indexSpecificationString + "." + token.name + " < 32;\n" +
                         "    pm.expect(result).to.equal(true)\n" +
                         "});\n\n");
     }
@@ -170,9 +171,9 @@ public class TestCreator {
                 "//Test to check " + token.name + " is valid month; between (inclusive) 1 and 12\n" +
                 "pm.test(\"Check " + token.name + " is valid month; between (inclusive) 1 and 12\", function () {\n");
         if (!token.isRequired)
-            writer.write("if(jsonData[randomIndex]." + token.name + " != null) \n");
+            writer.write("if(jsonData" + indexSpecificationString + "." + token.name + " != null) \n");
         writer.write(
-                "    var result = jsonData[randomIndex]." + token.name + " > 0 && jsonData[randomIndex]." + token.name + " < 13;\n" +
+                "    var result = jsonData" + indexSpecificationString + "." + token.name + " > 0 && jsonData" + indexSpecificationString + "." + token.name + " < 13;\n" +
                         "    pm.expect(result).to.equal(true)\n" +
                         "});\n\n");
     }
@@ -182,9 +183,9 @@ public class TestCreator {
                 "//Test to check " + token.name + " is valid year\n" +
                 "pm.test(\"Check " + token.name + " is valid year\", function () {\n");
         if (!token.isRequired)
-            writer.write("if(jsonData[randomIndex]." + token.name + " != null) \n");
+            writer.write("if(jsonData" + indexSpecificationString + "." + token.name + " != null) \n");
         writer.write(
-                "    pm.expect(jsonData[randomIndex]." + token.name + ").to.match(/^\\d{4}$/);\n" +
+                "    pm.expect(jsonData" + indexSpecificationString + "." + token.name + ").to.match(/^\\d{4}$/);\n" +
                         "});\n\n");
     }
 
@@ -193,9 +194,9 @@ public class TestCreator {
                 "//Test to check " + token.name + " is valid date\n" +
                 "pm.test(\"Check " + token.name + " is valid date\", function () {\n");
         if (!token.isRequired)
-            writer.write("if(jsonData[randomIndex]." + token.name + " != null) \n");
+            writer.write("if(jsonData" + indexSpecificationString + "." + token.name + " != null) \n");
         writer.write(
-                "    pm.expect(Date.parse(jsonData[randomIndex]." + token.name + ")).not.equal(NaN)\n" +
+                "    pm.expect(Date.parse(jsonData" + indexSpecificationString + "." + token.name + ")).not.equal(NaN)\n" +
                         "});\n\n");
     }
 
@@ -204,21 +205,26 @@ public class TestCreator {
                 "//Test to check " + token.name + " is a boolean\n" +
                 "pm.test(\"Check " + token.name + " is a boolean\", function () {\n");
         if (!token.isRequired)
-            writer.write("if(jsonData[randomIndex]." + token.name + " != null) \n");
+            writer.write("if(jsonData" + indexSpecificationString + "." + token.name + " != null) \n");
         writer.write(
-                "    pm.expect(typeof jsonData[randomIndex]." + token.name + ").to.equal('boolean')\n" +
+                "    pm.expect(typeof jsonData" + indexSpecificationString + "." + token.name + ").to.equal('boolean')\n" +
                         "});\n\n");
 
     }
 
-    /** Used for adding the prefix
+    /**
+     * Used for adding the prefix
      *
      * @throws IOException if the file isn't found
      */
     private static void arrayHelper() throws IOException {
-        writer.write("//Get globalData and a random index to check\n" +
-                "var jsonData = pm.response.json();\n" +
-                "var randomIndex = Math.floor(Math.random() * jsonData.length)\n\n");
+        writer.write("""
+                //Get globalData and a random index to check
+                var jsonData = pm.response.json();
+                var randomIndex = Math.floor(Math.random() * jsonData.length)
+
+                """);
+
     }
 
     /**
@@ -230,12 +236,12 @@ public class TestCreator {
                 "//Test to check " + token.name + " is a string\n" +
                 "pm.test(\"Check " + token.name + " is a string\", function () {\n");
         if (!token.isRequired)
-            writer.write("if(jsonData[randomIndex]." + token.name + " != null) \n");
+            writer.write("if(jsonData" + indexSpecificationString + "." + token.name + " != null) \n");
         writer.write(
-                "    pm.expect(typeof jsonData[randomIndex]." + token.name + ").to.equal('string')\n" +
+                "    pm.expect(typeof jsonData" + indexSpecificationString + "." + token.name + ").to.equal('string')\n" +
                         "});\n\n");
 
-        if(token.name.toLowerCase(Locale.ROOT).contains("date"))
+        if (token.name.toLowerCase(Locale.ROOT).contains("date"))
             regexStringDate(token);
     }
 
@@ -251,13 +257,17 @@ public class TestCreator {
         //Store the API name
         apiName = scan.next();
 
+        String storage = scan.next();
+
         //If it's an array call the array helper to insert the required header
-        if(scan.next().toLowerCase(Locale.ROOT).contains("array")){
-            doInsertArrayHeader = true;
+        if (storage.toLowerCase(Locale.ROOT).contains("array")) {
+            indexSpecificationString = "[randomIndex]";
+        } else {
+            allTokens.add(new SchemaToken(apiName, storage, scan.hasNext("required")));
         }
 
         //Void the required tag (Will always be required no matter what)
-        if(scan.hasNext("required")) scan.next();
+        if (scan.hasNext("required")) scan.next();
 
     }
 

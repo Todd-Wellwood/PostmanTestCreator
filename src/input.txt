@@ -45,7 +45,7 @@ required
 weaningDays
 number
 required
-predicableBithDate
+predictableBirthDate
 boolean
 required
 processingBeginsMonth
@@ -111,5 +111,3 @@ boolean
 required
 matureRefMJMELosingWght
 number
-naitcode
-string
