@@ -1,3 +1,4 @@
 /output/
 /.idea/
-/out/
+/out/*
+/Automatic-Postman-Tests.iml

@@ -217,9 +217,12 @@ public class TestCreator {
      * @throws IOException if the file isn't found
      */
     private static void arrayHelper() throws IOException {
-        writer.write("//Get globalData and a random index to check\n" +
-                "var jsonData = pm.response.json();\n" +
-                "var randomIndex = Math.floor(Math.random() * jsonData.length)\n\n");
+        writer.write("""
+                //Get globalData and a random index to check
+                var jsonData = pm.response.json();
+                var randomIndex = Math.floor(Math.random() * jsonData.length)
+
+                """);
 
     }
 
