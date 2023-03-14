@@ -5,6 +5,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
@@ -109,9 +112,10 @@ public class TestCreator {
         writer.close();
     }
 
-    /** Asks the user for specific validation options for a specific token,
-     *  This is used to assign each token to a specific regex helper method
-     *  These helper methods will then generate the correct regex test for that specific token
+    /**
+     * Asks the user for specific validation options for a specific token,
+     * This is used to assign each token to a specific regex helper method
+     * These helper methods will then generate the correct regex test for that specific token
      *  TODO: automate the asking part so it doesn't need to occur
      *
      * @param token the number token to sort to the correct helper method
@@ -146,7 +150,8 @@ public class TestCreator {
         }
     }
 
-    /** Generates test for tokens that need to be validated as positive eg, X > 0
+    /**
+     * Generates test for tokens that need to be validated as positive eg, X > 0
      *
      * @param token the token to generate the test for
      * @throws IOException if the file isn't found
@@ -162,7 +167,8 @@ public class TestCreator {
                         "});\n\n");
     }
 
-    /** Generates test for tokens that need to be validated as non-negative eg, X >= 0
+    /**
+     * Generates test for tokens that need to be validated as non-negative eg, X >= 0
      *
      * @param token the token to generate the test for
      * @throws IOException if the file isn't found
@@ -178,7 +184,8 @@ public class TestCreator {
                         "});\n\n");
     }
 
-    /** Generates test for tokens that need to be validated as a day (Number)
+    /**
+     * Generates test for tokens that need to be validated as a day (Number)
      *
      * @param token the token to generate the test for
      * @throws IOException if the file isn't found
@@ -195,7 +202,8 @@ public class TestCreator {
                         "});\n\n");
     }
 
-    /** Generates test for tokens that need to be validated as a month (Number)
+    /**
+     * Generates test for tokens that need to be validated as a month (Number)
      *
      * @param token the token to generate the test for
      * @throws IOException if the file isn't found
@@ -212,7 +220,8 @@ public class TestCreator {
                         "});\n\n");
     }
 
-    /** Generates test for tokens that need to be validated as a year
+    /**
+     * Generates test for tokens that need to be validated as a year
      *
      * @param token the token to generate the test for
      * @throws IOException if the file isn't found
@@ -228,7 +237,8 @@ public class TestCreator {
                         "});\n\n");
     }
 
-    /** Generates test for String tokens
+    /**
+     * Generates test for String tokens
      *
      * @param token the token to generate the test for
      * @throws IOException if the file isn't found
@@ -244,7 +254,8 @@ public class TestCreator {
                         "});\n\n");
     }
 
-    /** Generates test for boolean tokens
+    /**
+     * Generates test for boolean tokens
      *
      * @param token the token to generate the test for
      * @throws IOException if the file isn't found
@@ -261,7 +272,8 @@ public class TestCreator {
 
     }
 
-    /** Generates test for string tokens
+    /**
+     * Generates test for string tokens
      *
      * @param token The Array Token to process
      * @throws IOException if the file isn't found
@@ -313,7 +325,8 @@ public class TestCreator {
         //If it's an array call the array helper to insert the required header
         if (possibleArrayParameter.toLowerCase(Locale.ROOT).contains("array")) {
             indexSpecificationString = "[randomIndex]";
-        } else {
+        }
+        else {
             allTokens.add(new SchemaToken(apiName, possibleArrayParameter, scan.hasNext("required")));
         }
 
@@ -326,19 +339,34 @@ public class TestCreator {
      * Convert a schema to token
      */
     private static void convertSchemaToTokens() {
+
         //While more tokens to scan
         while (scan.hasNext()) {
-            //Store the information for a token
-            String fieldName = scan.next();
-            String tokenType = scan.next();
-            boolean isRequired = scan.hasNext("required");
+            //Get current line
+            String currentLine = scan.nextLine();
 
-            //Add the token to the List
-            allTokens.add(new SchemaToken(fieldName, tokenType, isRequired));
-            //Void the required tag
-            if (isRequired) scan.next();
+            //Get rid of all the stuff that isn't needed
+            int frequency = new StringTokenizer(currentLine, " ").countTokens();
+            if (frequency > 1 || currentLine.equals("") || currentLine.length() > 30) continue;
+
+            //First is Example check
+            boolean isExample = currentLine.contains("Example");
+            if (isExample) {
+              scan.next();
+            }
+            else {
+                String fieldName = currentLine;
+                String tokenType = scan.next();
+
+                boolean isRequired = scan.hasNext("required");
+                if(isRequired) scan.next();
+
+                //Add the token to the List
+                allTokens.add(new SchemaToken(fieldName, tokenType, isRequired));
+            }
         }
     }
+
 
     /**
      * Insert 100 new lines into the terminal,
