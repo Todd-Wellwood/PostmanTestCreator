@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 
@@ -69,7 +66,7 @@ public class TestCreator {
 
         //Get the names of all the required (can't be null) fields
         ArrayList<String> allNonNullFields = new ArrayList<>();
-        for (SchemaToken el : allTokens.stream().filter(i -> i.isRequired).collect(Collectors.toList())) {
+        for (SchemaToken el : allTokens.stream().filter(i -> i.isRequired).toList()) {
             allNonNullFields.add("\n        " + "\"" + el.name + "\"");
         }
 
@@ -91,8 +88,8 @@ public class TestCreator {
         writer.close();
     }
 
-    /**
-     * @throws IOException
+    /*
+     * Creates the regex test for the API
      */
     private static void regexTestCreation() throws IOException {
         //Initialise the file and setup for if it's an Array
@@ -347,14 +344,16 @@ public class TestCreator {
 
             //Get rid of all the stuff that isn't needed
             int frequency = new StringTokenizer(currentLine, " ").countTokens();
-            if (frequency > 1 || currentLine.equals("") || currentLine.length() > 30) continue;
+            if (frequency > 1 || currentLine.equals("") || currentLine.length() > 30 || currentLine.charAt(0) == ' ') continue;
 
             //First is Example check
             boolean isExample = currentLine.contains("Example");
-            if (isExample) {
+            boolean isDefault = currentLine.contains("Default");
+            if (isExample || isDefault) {
               scan.next();
             }
             else {
+                @SuppressWarnings("redundant")
                 String fieldName = currentLine;
                 String tokenType = scan.next();
 
