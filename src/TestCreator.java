@@ -80,8 +80,9 @@ public class TestCreator {
                 ";\n" +
                 "\n" +
                 " //Loop through all the required fields checking they are not null\n" +
-                " requiredElements.forEach(element =>\n" +
-                " pm.expect(jsonData" + indexSpecificationString + "[element]).to.not.equal(null));\n" +
+                " requiredElements.forEach(element => {\n" +
+                " pm.expect(jsonData" + indexSpecificationString + "[element]).to.not.equal(null);\n" +
+                " pm.expect(jsonData" + indexSpecificationString + "[element],element).to.not.equal(undefined)});\n" +
                 "});"
         );
 
@@ -321,7 +322,7 @@ public class TestCreator {
 
         //If it's an array call the array helper to insert the required header
         if (possibleArrayParameter.toLowerCase(Locale.ROOT).contains("array")) {
-            indexSpecificationString = "[randomIndex]";
+            indexSpecificationString = ".content[randomIndex]";
         }
         else {
             allTokens.add(new SchemaToken(apiName, possibleArrayParameter, scan.hasNext("required")));
@@ -329,7 +330,6 @@ public class TestCreator {
 
         //Void the required tag (Will always be required no matter what)
         if (scan.hasNext("required")) scan.next();
-
     }
 
     /**

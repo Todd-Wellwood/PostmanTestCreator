@@ -1,16 +1,3 @@
-GetProducts
-
-links
-array[hateoasLink]
-required
-links
-
-Example:
-[{"rel":"self","href":"https://api.farmiq.co.nz/resource/123"},{"rel":"parent","href":"https://api.farmiq.co.nz/resource/456"}]
-rel
-string
-href
-string
 content
 array[Medicine]
 required
@@ -47,20 +34,6 @@ TreatmentType
 required
 Treatment type. This is a sub-model consumed in Medicine
 
-id
-number
-required
-treatment type id
-
-Example:
-5
-name
-string
-required
-treatment type name
-
-Example:
-Dip
 medicineScope
 string
 required
