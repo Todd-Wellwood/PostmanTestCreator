@@ -72,7 +72,7 @@ public class TestCreator {
 
         writer.write("" +
                 "//Test to loop through all the required fields are not null\n" +
-                "pm.test(\"Check all fields are present\", function () {\n" +
+                "pm.test(\"Check all required fields are not null\", function () {\n" +
                 "\n   var requiredElements ="
                 +
                 allNonNullFields
