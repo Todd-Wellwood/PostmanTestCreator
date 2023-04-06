@@ -300,7 +300,7 @@ public class TestCreator {
         writer.write("""
                 //Get globalData and a random index to check
                 var jsonData = pm.response.json();
-                var randomIndex = Math.floor(Math.random() * jsonData.length)
+                var randomIndex = Math.floor(Math.random() * jsonData.content.length)
 
                 """);
     }

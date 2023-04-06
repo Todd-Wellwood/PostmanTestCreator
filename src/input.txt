@@ -1,81 +1,63 @@
 content
-array[Medicine]
-required
-content
-
+array[MedicineBatch]
 id
-integer
+number
+batch id
+
+Example:
+234
+UUID
+string
+batchNumber
+string
+required
+batch number
+
+Example:
+25012023
+medicineId
+number
 medicine id
 
 Example:
-4353
-UUID
-string
-<uuid>
-required
-medicine uuid
-
-name
+745
+medicineUUID
 string
 required
-medicine name
+medicine UUID
 
-Example:
-Bomac Copper Bullet
-hormone
-boolean
-required
-hormone
-
-Default:
-false
-treatmentType
-TreatmentType
-required
-Treatment type. This is a sub-model consumed in Medicine
-
-medicineScope
+expiryDate
 string
 required
-medicine scope
+expiry date
 
-Allowed values:
-org
-farm
-Example:
-farm
-produceWithholdingPeriod
-integer
-required
-produce withholding period in days
-
-Example:
-10
-meatWithholdingPeriod
-integer
-required
-meat withholding period in days
-
-Example:
-15
-animalRestrictions
-array[string]
-required
-animal types that medicine can be applicated to
-
-Allowed values:
-sheep
-cattle
-applicationRates
-array[MedicineApplicationRate]
-lastUsedDate
+purchaseDate
 string
-<date-time>
-last used date
+required
+purchase date
 
-links
-array[hateoasLink]
-A collection of hypermedia links supplied to make it easier to modify the location and substance of resources
+usedQuantity
+number
+quantity used
 
 Example:
-[{"rel":"self","href":"https://api.farmiq.co.nz/resource/123"},{"rel":"parent","href":"https://api.farmiq.co.nz/resource/456"}]
+5.5
+purchaseQuantity
+number
+quantity purchased
+
+Example:
+30.5
+unitType
+string
+required
+
+Example:
+l
+description
+string
+
+location
+string
+Example:
+Waikato
